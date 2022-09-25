@@ -23,7 +23,8 @@ do
     if (period.Equals("exit", StringComparison.CurrentCultureIgnoreCase)) Environment.Exit(0);
 
     var result = await classroomService.CreateSeatingChartAsync(int.Parse(period), int.Parse(size[0]), int.Parse(size[1]));
-    Console.WriteLine(classroomService.CreateSeatingChartDisplay(result));
+
+    Console.WriteLine(classroomService.GenerateSeatingChartDisplayText(result));
   }
   catch (Exception ex)
   {

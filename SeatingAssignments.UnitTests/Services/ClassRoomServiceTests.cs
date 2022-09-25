@@ -1,5 +1,4 @@
 using Moq;
-using System.Text.Json;
 using SeatingAssignments.Data;
 using SeatingAssignments.Service;
 
@@ -57,7 +56,7 @@ namespace SeatingAssignments.UnitTests.Services
       Assert.Equal(1, result.Period);
       Assert.Equal(2, result.TotalRows);
       Assert.Equal(3, result.TotalColumns);
-      Assert.Empty(result.Seats);
+      AssertExtensions.IsAllSeatsNull(result.Seats);
     }
 
     [Fact]
@@ -66,24 +65,17 @@ namespace SeatingAssignments.UnitTests.Services
       _classroomRepository.Setup(m => m.GetStudentsForPeriodAsync(1))
         .Returns(Task.FromResult(_students));
 
-      var seats = new List<Seat>()
-      {
-        new Seat { FirstName = "Billy", LastName = "Zinger", Number = 3, Row = 1 },
-        new Seat { Number = 2, Row = 1 },
-        new Seat { FirstName = "Johnny", LastName = "Rocket", Number = 1, Row = 1 },
-        new Seat { Number = 3, Row = 2 },
-        new Seat { FirstName = "John", LastName = "Doe", Number = 2, Row = 2 },
-        new Seat { Number = 1, Row = 2 },
-        new Seat { FirstName = "Foo", LastName = "Bar", Number = 3, Row = 3 },
-        new Seat { Number = 2, Row = 3 },
-        new Seat { FirstName = "Red", LastName = "Alpha", Number = 1, Row = 3 },
-      };
-
       var result = await _sut.CreateSeatingChartAsync(1, 3, 3);
 
-      var strResult = JsonSerializer.Serialize(result.Seats);
-      var strExpected = JsonSerializer.Serialize(seats);
-      Assert.Equal(strExpected, strResult);
+      Assert.Equal("Billy Zinger", result.Seats[0,2].FullName);
+      Assert.True(result.Seats[0, 1].Available);
+      Assert.Equal("Johnny Rocket", result.Seats[0, 0].FullName);
+      Assert.True(result.Seats[1, 2].Available);
+      Assert.Equal("John Doe", result.Seats[1, 1].FullName);
+      Assert.True(result.Seats[1, 0].Available);
+      Assert.Equal("Foo Bar", result.Seats[2, 2].FullName);
+      Assert.True(result.Seats[2, 1].Available);
+      Assert.Equal("Red Alpha", result.Seats[2, 0].FullName);
       Assert.Equal(1, result.Period);
       Assert.Equal(3, result.TotalColumns);
       Assert.Equal(3, result.TotalRows);
@@ -95,47 +87,37 @@ namespace SeatingAssignments.UnitTests.Services
       _classroomRepository.Setup(m => m.GetStudentsForPeriodAsync(1))
         .Returns(Task.FromResult(_students));
 
-      var seats = new List<Seat>()
-      {
-        new Seat { FirstName = "Billy", LastName = "Zinger", Number = 2, Row = 1 },
-        new Seat { Number = 1, Row = 1 },
-        new Seat { FirstName = "Johnny", LastName = "Rocket", Number = 2, Row = 2 },
-        new Seat { FirstName = "John", LastName = "Doe", Number = 1, Row = 2 },
-        new Seat { FirstName = "Foo", LastName = "Bar", Number = 2, Row = 3 },
-        new Seat { FirstName = "Red", LastName = "Alpha", Number = 1, Row = 3 },
-      };
-
       var result = await _sut.CreateSeatingChartAsync(1, 3, 2);
 
-      var strResult = JsonSerializer.Serialize(result.Seats);
-      var strExpected = JsonSerializer.Serialize(seats);
-      Assert.Equal(strExpected, strResult);
+      Assert.Equal("Billy Zinger", result.Seats[0, 1].FullName);
+      Assert.True(result.Seats[0, 0].Available);
+      Assert.Equal("Johnny Rocket", result.Seats[1, 1].FullName);
+      Assert.Equal("John Doe", result.Seats[1, 0].FullName);
+      Assert.Equal("Foo Bar", result.Seats[2, 1].FullName);
+      Assert.Equal("Red Alpha", result.Seats[2, 0].FullName);
       Assert.Equal(1, result.Period);
       Assert.Equal(2, result.TotalColumns);
       Assert.Equal(3, result.TotalRows);
     }
 
     [Fact]
-    public void CreateSeatingChartDisplay_Valid_3x2()
+    public void GenerateSeatingChartDisplayText_Valid_3x2()
     {
-      var expected = "Seating Chart for Period: 0\r\nTotal Students: 5\r\n\r\nX               Billy Zinger    \r\nJohn Doe        Johnny Rocket   \r\nRed Alpha       Foo Bar         \r\n";
+      var expected =
+        "Seating Chart for Period: 0\r\nTotal Students: 5\r\n\r\n********** Insert Teacher, Desk, Etc.. Here **********\r\n\r\nX                        Billy Zinger             \r\nJohn Doe                 Johnny Rocket            \r\nRed Alpha                Foo Bar                  \r\n";
       _classroomRepository.Setup(m => m.GetStudentsForPeriodAsync(1))
         .Returns(Task.FromResult(_students));
 
-      var seatingChart = new SeatingChartModel(3, 2)
-      {
-        Seats = new List<Seat>()
-        {
-          new Seat { FirstName = "Billy", LastName = "Zinger", Number = 2, Row = 1 },
-          new Seat { Number = 1, Row = 1 },
-          new Seat { FirstName = "Johnny", LastName = "Rocket", Number = 2, Row = 2 },
-          new Seat { FirstName = "John", LastName = "Doe", Number = 1, Row = 2 },
-          new Seat { FirstName = "Foo", LastName = "Bar", Number = 2, Row = 3 },
-          new Seat { FirstName = "Red", LastName = "Alpha", Number = 1, Row = 3 },
-        }
-      };
+      var seatingChart = new SeatingChartModel(3, 2);
 
-      var result = _sut.CreateSeatingChartDisplay(seatingChart);
+      seatingChart.Seats[0, 1] = new Seat { FirstName = "Billy", LastName = "Zinger", Column = 2, Row = 1 };
+      seatingChart.Seats[0, 0] = new Seat { Column = 1, Row = 1 };
+      seatingChart.Seats[1, 1] = new Seat { FirstName = "Johnny", LastName = "Rocket", Column = 2, Row = 2 };
+      seatingChart.Seats[1, 0] = new Seat { FirstName = "John", LastName = "Doe", Column = 1, Row = 2 };
+      seatingChart.Seats[2, 1] = new Seat { FirstName = "Foo", LastName = "Bar", Column = 2, Row = 3 };
+      seatingChart.Seats[2, 0] = new Seat { FirstName = "Red", LastName = "Alpha", Column = 1, Row = 3 };
+
+      var result = _sut.GenerateSeatingChartDisplayText(seatingChart);
 
       Assert.Equal(expected, result);
     }
