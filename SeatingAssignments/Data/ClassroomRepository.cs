@@ -3,7 +3,11 @@ using System.Text.Json;
 
 namespace SeatingAssignments.Data
 {
-  public  class ClassroomRepository
+  public interface IClassroomRepository
+  {
+    Task<IEnumerable<ClassroomEntity>> GetStudentsForPeriodAsync(int period);
+  }
+  public  class ClassroomRepository: IClassroomRepository
   {
     public async Task<IEnumerable<ClassroomEntity>> GetStudentsForPeriodAsync(int period)
     {

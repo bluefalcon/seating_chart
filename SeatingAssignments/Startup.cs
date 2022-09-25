@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using SeatingAssignments.Data;
 using SeatingAssignments.Service;
 
@@ -21,7 +20,7 @@ namespace SeatingAssignments
       var serviceCollection = new ServiceCollection();
 
       serviceCollection.AddSingleton<IClassroomService, ClassroomService>();
-      serviceCollection.AddSingleton<ClassroomRepository>();
+      serviceCollection.AddSingleton<IClassroomRepository, ClassroomRepository>();
 
       ServiceProvider = serviceCollection.BuildServiceProvider();
     }

@@ -1,5 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
+﻿
 namespace SeatingAssignments.Service
 {
   public class Seat
@@ -18,13 +17,11 @@ namespace SeatingAssignments.Service
     {
       TotalRows = rows;
       TotalColumns = columns;
-      SeatingAssignments = new string[rows, columns];
       Seats = new List<Seat>();
     }
     public int Period { get; set; }
     public int TotalRows { get; }
     public int TotalColumns { get; }
     public List<Seat> Seats { get; set; }
-    public string[,] SeatingAssignments { get; set; }
   }
 }

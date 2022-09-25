@@ -6,16 +6,16 @@ namespace SeatingAssignments.Service
   public interface IClassroomService
   {
     Task<SeatingChartModel> CreateSeatingChartAsync(int period, int rows, int columns);
-    string GetSeatingChart(SeatingChartModel model);
+   // string GetSeatingChart(SeatingChartModel model);
     string CreateSeatingChartDisplay(SeatingChartModel seatingChart);
   }
   public class ClassroomService : IClassroomService
   {
-    private readonly ClassroomRepository _classroomRepository;
+    private readonly IClassroomRepository _classroomRepository;
 
-    public ClassroomService(ClassroomRepository classroomRepository)
+    public ClassroomService(IClassroomRepository classroomRepository)
     {
-      _classroomRepository = classroomRepository ?? new ClassroomRepository();
+      _classroomRepository = classroomRepository;
     }
 
     public async Task<SeatingChartModel> CreateSeatingChartAsync(int period, int rows, int columns)
@@ -33,7 +33,6 @@ namespace SeatingAssignments.Service
 
       var totalStudents = sortedStudents.Count();
       var totalSeats = (rows * columns);
-
       if (totalStudents <= 0) return seatingChartResult;
       if (totalStudents > totalSeats) throw new Exception($"Total Students: {totalStudents} exceeds Total Seats: {totalSeats}");
 
@@ -60,8 +59,7 @@ namespace SeatingAssignments.Service
               Number = col,
               Row = row
             });
-              seatingChartResult.SeatingAssignments[row - 1, col - 1] = $"{sortedStudents[currentStudent].FirstName} {sortedStudents[currentStudent].LastName}";
-              currentStudent++;
+            currentStudent++;
           }
           else
           {
@@ -95,23 +93,6 @@ namespace SeatingAssignments.Service
         {
           var str = seat.Available ? "X" : seat.FullName;
           result.Append(str.PadRight(pad));
-        }
-
-        result.AppendLine();
-      }
-
-      return result.ToString();
-    }
-
-    public string GetSeatingChart(SeatingChartModel model)
-    {
-      var result = new StringBuilder();
-      for (int row = 0; row < model.SeatingAssignments.GetLength(0); row++)
-      {
-        for (int col = 0; col < model.SeatingAssignments.GetLength(1); col++)
-        {
-          var str = model.SeatingAssignments[row, col] == null ? "X" : model.SeatingAssignments[row, col];
-          result.Append(str.PadRight(25));
         }
 
         result.AppendLine();

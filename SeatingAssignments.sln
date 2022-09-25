@@ -5,6 +5,8 @@ VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeatingAssignments", "SeatingAssignments\SeatingAssignments.csproj", "{10F9A628-6F67-4D3E-9B84-5E78A518A09C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeatingAssignments.UnitTests", "SeatingAssignments.UnitTests\SeatingAssignments.UnitTests.csproj", "{B6EFFDBD-45C0-49CC-86DF-2DED6EFD4CE6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{10F9A628-6F67-4D3E-9B84-5E78A518A09C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10F9A628-6F67-4D3E-9B84-5E78A518A09C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10F9A628-6F67-4D3E-9B84-5E78A518A09C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6EFFDBD-45C0-49CC-86DF-2DED6EFD4CE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6EFFDBD-45C0-49CC-86DF-2DED6EFD4CE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6EFFDBD-45C0-49CC-86DF-2DED6EFD4CE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6EFFDBD-45C0-49CC-86DF-2DED6EFD4CE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
