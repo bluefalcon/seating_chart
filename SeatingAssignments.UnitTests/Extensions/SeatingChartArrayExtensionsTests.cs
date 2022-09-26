@@ -3,8 +3,15 @@ using SeatingAssignments.Service;
 
 namespace SeatingAssignments.UnitTests.Extensions
 {
-  public class SeatingChartArrayExtesnionsTests
+  public class SeatingChartArrayExtensionsTests
   {
+    [Fact]
+    public void InitWithEmptySeats_AllAvailable()
+    {
+      var seats = new Seat[5, 5];
+      seats.InitWithEmptySeats();
+      AssertExtensions.IsAllSeatsAvailable(seats);
+    }
 
     [Fact]
     public void TotalStudents_Zero()

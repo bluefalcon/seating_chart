@@ -4,18 +4,29 @@ namespace SeatingAssignments.Extensions
 {
   public static class SeatingChartArrayExtensions
   {
-    public static int TotalStudents(this Seat[,] seatingChart)
+    public static int TotalStudents(this Seat[,] seats)
     {
       var totalStudents = 0;
-      for (var row = 0; row < seatingChart.GetLength(0); row++)
+      for (var row = 0; row < seats.GetLength(0); row++)
       {
-        for (var col = 0; col < seatingChart.GetLength(1); col++)
+        for (var col = 0; col < seats.GetLength(1); col++)
         {
-          if (seatingChart[row, col] != null && !seatingChart[row, col].Available) totalStudents++;
+          if (seats[row, col] != null && !seats[row, col].Available) totalStudents++;
         }
       }
 
       return totalStudents;
+    }
+
+    public static void InitWithEmptySeats(this Seat[,] seats)
+    {
+      for (var row = 0; row < seats.GetLength(0); row++)
+      {
+        for (var col = 0; col < seats.GetLength(1); col++)
+        {
+          seats[row, col] = new Seat { Row = row + 1, Column = col + 1 };
+        }
+      }
     }
   }
 }

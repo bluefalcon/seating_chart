@@ -1,4 +1,6 @@
 ﻿
+using SeatingAssignments.Extensions;
+
 namespace SeatingAssignments.Service
 {
   public class Seat
@@ -17,6 +19,7 @@ namespace SeatingAssignments.Service
       TotalRows = rows;
       TotalColumns = columns;
       Seats = new Seat[rows, columns];
+      Seats.InitWithEmptySeats();
     }
     public int Period { get; set; }
     public int TotalRows { get; }

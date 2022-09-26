@@ -56,7 +56,7 @@ namespace SeatingAssignments.UnitTests.Services
       Assert.Equal(1, result.Period);
       Assert.Equal(2, result.TotalRows);
       Assert.Equal(3, result.TotalColumns);
-      AssertExtensions.IsAllSeatsNull(result.Seats);
+      AssertExtensions.IsAllSeatsAvailable(result.Seats);
     }
 
     [Fact]
@@ -90,11 +90,11 @@ namespace SeatingAssignments.UnitTests.Services
       var result = await _sut.CreateSeatingChartAsync(1, 3, 2);
 
       Assert.Equal("Billy Zinger", result.Seats[0, 1].FullName);
-      Assert.True(result.Seats[0, 0].Available);
-      Assert.Equal("Johnny Rocket", result.Seats[1, 1].FullName);
-      Assert.Equal("John Doe", result.Seats[1, 0].FullName);
-      Assert.Equal("Foo Bar", result.Seats[2, 1].FullName);
-      Assert.Equal("Red Alpha", result.Seats[2, 0].FullName);
+      Assert.Equal("Johnny Rocket", result.Seats[0, 0].FullName);
+      Assert.Equal("John Doe", result.Seats[1, 1].FullName);
+      Assert.Equal("Foo Bar", result.Seats[1, 0].FullName);
+      Assert.Equal("Red Alpha", result.Seats[2, 1].FullName);
+      Assert.True(result.Seats[2, 0].Available);
       Assert.Equal(1, result.Period);
       Assert.Equal(2, result.TotalColumns);
       Assert.Equal(3, result.TotalRows);
@@ -104,7 +104,7 @@ namespace SeatingAssignments.UnitTests.Services
     public void GenerateSeatingChartDisplayText_Valid_3x2()
     {
       var expected =
-        "Seating Chart for Period: 0\r\nTotal Students: 5\r\n\r\n********** Insert Teacher, Desk, Etc.. Here **********\r\n\r\nX                        Billy Zinger             \r\nJohn Doe                 Johnny Rocket            \r\nRed Alpha                Foo Bar                  \r\n";
+        "Seating Chart for Period: 0\r\nTotal Students: 5\r\n\r\n********** Front Of Classroom **********\r\n\r\n-                        Billy Zinger             \r\nJohn Doe                 Johnny Rocket            \r\nRed Alpha                Foo Bar                  \r\n";
       _classroomRepository.Setup(m => m.GetStudentsForPeriodAsync(1))
         .Returns(Task.FromResult(_students));
 

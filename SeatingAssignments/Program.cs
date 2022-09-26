@@ -12,12 +12,13 @@ do
   {
     Console.WriteLine("Hello Teacher for some Classroom! Let's create a seating chart");
     Console.WriteLine("Type 'exit' to exit program");
-    Console.WriteLine("What Period do you want to create a seating chart for:");
+    Console.WriteLine("What Period do you want to create a seating chart for:  ");
 
     var period = Console.ReadLine();
     if (period.Equals("exit", StringComparison.CurrentCultureIgnoreCase)) Environment.Exit(0);
-    Console.WriteLine("How big is your classroom? ex. 8x9");
+    Console.WriteLine("Classroom size ex. 8x9. defaults to 8x9:  ");
     var sizeInput = Console.ReadLine();
+    if (string.IsNullOrEmpty(sizeInput)) sizeInput = "8x9";
     if (period.Equals("exit", StringComparison.CurrentCultureIgnoreCase)) Environment.Exit(0);
     var size = sizeInput.Split('x', StringSplitOptions.RemoveEmptyEntries);
     if (period.Equals("exit", StringComparison.CurrentCultureIgnoreCase)) Environment.Exit(0);
