@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SeatingAssignments.Data;
-using SeatingAssignments.Service;
+using SeatingAssignments.Services;
 
 namespace SeatingAssignments
 {
@@ -19,7 +19,7 @@ namespace SeatingAssignments
     {
       var serviceCollection = new ServiceCollection();
 
-      serviceCollection.AddSingleton<IClassroomService, ClassroomService>();
+      serviceCollection.AddSingleton<ISeatingChartService, SeatingChartService>();
       serviceCollection.AddSingleton<IClassroomRepository, ClassroomRepository>();
 
       ServiceProvider = serviceCollection.BuildServiceProvider();

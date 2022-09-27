@@ -1,25 +1,40 @@
 ﻿using System.Text;
 using SeatingAssignments.Data;
 using SeatingAssignments.Extensions;
+using SeatingAssignments.Models;
 
-namespace SeatingAssignments.Service
+namespace SeatingAssignments.Services
 {
-  public interface IClassroomService
+  public interface ISeatingChartService
   {
-    Task<SeatingChartModel> CreateSeatingChartAsync(int period, int rows, int columns);
+
+    /// <summary>
+    /// Generates a Classroom Seating chart
+    /// </summary>
+    /// <param name="period"></param>
+    /// <param name="rows"></param>
+    /// <param name="columns"></param>
+    /// <returns></returns>
+    Task<SeatingChartModel> GenerateSeatingChartAsync(int period, int rows, int columns);
+
+    /// <summary>
+    /// Generates a String of text to display on the console.  Should probably move to program.cs
+    /// </summary>
+    /// <param name="seatingChart"></param>
+    /// <returns></returns>
     string GenerateSeatingChartDisplayText(SeatingChartModel seatingChart);
   }
 
-  public class ClassroomService : IClassroomService
+  public class SeatingChartService : ISeatingChartService
   {
     private readonly IClassroomRepository _classroomRepository;
 
-    public ClassroomService(IClassroomRepository classroomRepository)
+    public SeatingChartService(IClassroomRepository classroomRepository)
     {
       _classroomRepository = classroomRepository;
     }
 
-    public async Task<SeatingChartModel> CreateSeatingChartAsync(int period, int rows, int columns)
+    public async Task<SeatingChartModel> GenerateSeatingChartAsync(int period, int rows, int columns)
     {
       if (period <= 0) throw new ArgumentException("Period less than equal To 0", nameof(period));
       if (rows <= 0) throw new ArgumentException("Rows Less than Equal To 0", nameof(rows));
@@ -40,53 +55,47 @@ namespace SeatingAssignments.Service
       if (totalStudents > totalSeats)
         throw new Exception($"Total Students: {totalStudents} exceeds Total Seats: {totalSeats}");
 
-      var spacesAvailable = totalSeats - totalStudents;
-      var studentsNoSpace = totalStudents - spacesAvailable;
-      var currentStudent = 0;
+      var spacesAvailableCount = totalSeats - totalStudents;
+      var studentsNoSpaceCount = Math.Max(0, totalStudents - spacesAvailableCount);
+      var currentSortedStudentPos = 0;
 
       Func<int, bool> outOfStudentsFunc = (currentPosition) => currentPosition >= sortedStudents.Count;
-      Func<int, bool> checkOutOfStudentNoSpace = (studentsNoSpaceCount) => studentsNoSpaceCount < totalStudents && studentsNoSpaceCount > 0;
+      Func<int, bool> outOfStudentsNoSpaceFunc = (currentStudentsNoSpaceCount) =>  currentStudentsNoSpaceCount < totalStudents && currentStudentsNoSpaceCount > 0;
 
-    for (var row = 1; row <= rows; row++)
+      for (var row = 1; row <= rows; row++)
       {
         var isEvenRow = row % 2 == 0;
         var workingColumn = 1;
+        if (outOfStudentsFunc(currentSortedStudentPos)) break;
         for (var col = columns; col > 0; col--)
         {
+          if (outOfStudentsFunc(currentSortedStudentPos)) break;
           var isEvenCol = workingColumn % 2 == 0;
 
           var addEvenRowStudent = false;
           var addOddRowStudent = false;
-          if (checkOutOfStudentNoSpace(studentsNoSpace))
+          if (outOfStudentsNoSpaceFunc(studentsNoSpaceCount))
           {
             addEvenRowStudent = true;
             addOddRowStudent = true;
           }
           else
           {
-            addEvenRowStudent = isEvenRow && isEvenCol &&  spacesAvailable > 0 ||  spacesAvailable == 0;
-            addOddRowStudent = !isEvenRow && !isEvenCol &&  spacesAvailable > 0 ||  spacesAvailable == 0;
+            addEvenRowStudent = isEvenRow && isEvenCol && spacesAvailableCount > 0 || spacesAvailableCount == 0;
+            addOddRowStudent = !isEvenRow && !isEvenCol && spacesAvailableCount > 0 || spacesAvailableCount == 0;
           }
 
-
-          if (addEvenRowStudent && !outOfStudentsFunc(currentStudent) ||
-              addOddRowStudent && !outOfStudentsFunc(currentStudent))
+          if (addEvenRowStudent || addOddRowStudent)
           {
-            var seat = new Seat
-            {
-              FirstName = sortedStudents[currentStudent].FirstName,
-              LastName = sortedStudents[currentStudent].LastName,
-              Column = col,
-              Row = row
-            };
-            seatingChartResult.Seats[row - 1, col - 1] = seat;
-            currentStudent++;
-            if (checkOutOfStudentNoSpace(studentsNoSpace)) studentsNoSpace--;
+            seatingChartResult.Seats[row - 1, col - 1].FirstName = sortedStudents[currentSortedStudentPos].FirstName;
+            seatingChartResult.Seats[row - 1, col - 1].LastName = sortedStudents[currentSortedStudentPos].LastName;
+
+            currentSortedStudentPos++;
+            if (outOfStudentsNoSpaceFunc(studentsNoSpaceCount)) studentsNoSpaceCount--;
           }
           else
           {
-            seatingChartResult.Seats[row - 1, col - 1] = new Seat { Column = col, Row = row };
-            if ( spacesAvailable > 0)  spacesAvailable--;
+            if (spacesAvailableCount > 0) spacesAvailableCount--;
           }
 
           workingColumn++;

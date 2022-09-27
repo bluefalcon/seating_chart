@@ -1,10 +1,10 @@
-﻿using SeatingAssignments.Service;
+﻿using SeatingAssignments.Models;
 
 namespace SeatingAssignments.Extensions
 {
   public static class SeatingChartArrayExtensions
   {
-    public static int TotalStudents(this Seat[,] seats)
+    public static int TotalStudents(this SeatModel[,] seats)
     {
       var totalStudents = 0;
       for (var row = 0; row < seats.GetLength(0); row++)
@@ -18,13 +18,13 @@ namespace SeatingAssignments.Extensions
       return totalStudents;
     }
 
-    public static void InitWithEmptySeats(this Seat[,] seats)
+    public static void InitWithEmptySeats(this SeatModel[,] seats)
     {
       for (var row = 0; row < seats.GetLength(0); row++)
       {
         for (var col = 0; col < seats.GetLength(1); col++)
         {
-          seats[row, col] = new Seat { Row = row + 1, Column = col + 1 };
+          seats[row, col] = new SeatModel { Row = row + 1, Column = col + 1 };
         }
       }
     }

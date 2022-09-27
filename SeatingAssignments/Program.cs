@@ -2,10 +2,10 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using SeatingAssignments;
-using SeatingAssignments.Service;
+using SeatingAssignments.Services;
 
 var startup = new Startup();
-var classroomService = startup.ServiceProvider.GetRequiredService<IClassroomService>();
+var seatingChartService = startup.ServiceProvider.GetRequiredService<ISeatingChartService>();
 do
 {
   try
@@ -23,9 +23,9 @@ do
     var size = sizeInput.Split('x', StringSplitOptions.RemoveEmptyEntries);
     if (period.Equals("exit", StringComparison.CurrentCultureIgnoreCase)) Environment.Exit(0);
 
-    var result = await classroomService.CreateSeatingChartAsync(int.Parse(period), int.Parse(size[0]), int.Parse(size[1]));
+    var result = await seatingChartService.GenerateSeatingChartAsync(int.Parse(period), int.Parse(size[0]), int.Parse(size[1]));
 
-    Console.WriteLine(classroomService.GenerateSeatingChartDisplayText(result));
+    Console.WriteLine(seatingChartService.GenerateSeatingChartDisplayText(result));
   }
   catch (Exception ex)
   {

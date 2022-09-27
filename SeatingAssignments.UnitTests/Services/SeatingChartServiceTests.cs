@@ -1,19 +1,21 @@
 using Moq;
 using SeatingAssignments.Data;
-using SeatingAssignments.Service;
+using SeatingAssignments.Models;
+using SeatingAssignments.Services;
+using SeatingAssignments.UnitTests.TestUtils;
 
 namespace SeatingAssignments.UnitTests.Services
 {
-  public class ClassRoomServiceTests
+    public class SeatingChartServiceTests
   {
-    private readonly IClassroomService _sut;
+    private readonly ISeatingChartService _sut;
     private readonly Mock<IClassroomRepository> _classroomRepository;
     private readonly IEnumerable<ClassroomEntity> _students;
 
-    public ClassRoomServiceTests()
+    public SeatingChartServiceTests()
     {
       _classroomRepository = new Mock<IClassroomRepository>();
-      _sut = new ClassroomService(_classroomRepository.Object);
+      _sut = new SeatingChartService(_classroomRepository.Object);
       _students = new List<ClassroomEntity>()
       {
         new ClassroomEntity { FirstName = "Billy", LastName = "Zinger", Period = 1 },
@@ -31,7 +33,7 @@ namespace SeatingAssignments.UnitTests.Services
     public async Task CreateSeatingChartAsync_When_Invalid_Argument_ThrowArgumentException(int period, int rows,
       int columns)
     {
-      await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateSeatingChartAsync(period, rows, columns));
+      await Assert.ThrowsAsync<ArgumentException>(() => _sut.GenerateSeatingChartAsync(period, rows, columns));
     }
 
     [Fact]
@@ -40,7 +42,7 @@ namespace SeatingAssignments.UnitTests.Services
       _classroomRepository.Setup(m => m.GetStudentsForPeriodAsync(1))
         .Returns(Task.FromResult(_students));
 
-      await Assert.ThrowsAsync<Exception>(() => _sut.CreateSeatingChartAsync(1, 2, 2));
+      await Assert.ThrowsAsync<Exception>(() => _sut.GenerateSeatingChartAsync(1, 2, 2));
     }
 
     [Fact]
@@ -51,7 +53,7 @@ namespace SeatingAssignments.UnitTests.Services
       _classroomRepository.Setup(m => m.GetStudentsForPeriodAsync(1))
         .Returns(Task.FromResult(students));
 
-      var result = await _sut.CreateSeatingChartAsync(1, 2, 3);
+      var result = await _sut.GenerateSeatingChartAsync(1, 2, 3);
 
       Assert.Equal(1, result.Period);
       Assert.Equal(2, result.TotalRows);
@@ -65,7 +67,7 @@ namespace SeatingAssignments.UnitTests.Services
       _classroomRepository.Setup(m => m.GetStudentsForPeriodAsync(1))
         .Returns(Task.FromResult(_students));
 
-      var result = await _sut.CreateSeatingChartAsync(1, 3, 3);
+      var result = await _sut.GenerateSeatingChartAsync(1, 3, 3);
 
       Assert.Equal("Billy Zinger", result.Seats[0,2].FullName);
       Assert.True(result.Seats[0, 1].Available);
@@ -87,7 +89,7 @@ namespace SeatingAssignments.UnitTests.Services
       _classroomRepository.Setup(m => m.GetStudentsForPeriodAsync(1))
         .Returns(Task.FromResult(_students));
 
-      var result = await _sut.CreateSeatingChartAsync(1, 3, 2);
+      var result = await _sut.GenerateSeatingChartAsync(1, 3, 2);
 
       Assert.Equal("Billy Zinger", result.Seats[0, 1].FullName);
       Assert.Equal("Johnny Rocket", result.Seats[0, 0].FullName);
@@ -110,12 +112,12 @@ namespace SeatingAssignments.UnitTests.Services
 
       var seatingChart = new SeatingChartModel(3, 2);
 
-      seatingChart.Seats[0, 1] = new Seat { FirstName = "Billy", LastName = "Zinger", Column = 2, Row = 1 };
-      seatingChart.Seats[0, 0] = new Seat { Column = 1, Row = 1 };
-      seatingChart.Seats[1, 1] = new Seat { FirstName = "Johnny", LastName = "Rocket", Column = 2, Row = 2 };
-      seatingChart.Seats[1, 0] = new Seat { FirstName = "John", LastName = "Doe", Column = 1, Row = 2 };
-      seatingChart.Seats[2, 1] = new Seat { FirstName = "Foo", LastName = "Bar", Column = 2, Row = 3 };
-      seatingChart.Seats[2, 0] = new Seat { FirstName = "Red", LastName = "Alpha", Column = 1, Row = 3 };
+      seatingChart.Seats[0, 1] = new SeatModel { FirstName = "Billy", LastName = "Zinger", Column = 2, Row = 1 };
+      seatingChart.Seats[0, 0] = new SeatModel { Column = 1, Row = 1 };
+      seatingChart.Seats[1, 1] = new SeatModel { FirstName = "Johnny", LastName = "Rocket", Column = 2, Row = 2 };
+      seatingChart.Seats[1, 0] = new SeatModel { FirstName = "John", LastName = "Doe", Column = 1, Row = 2 };
+      seatingChart.Seats[2, 1] = new SeatModel { FirstName = "Foo", LastName = "Bar", Column = 2, Row = 3 };
+      seatingChart.Seats[2, 0] = new SeatModel { FirstName = "Red", LastName = "Alpha", Column = 1, Row = 3 };
 
       var result = _sut.GenerateSeatingChartDisplayText(seatingChart);
 
