@@ -60,7 +60,7 @@ namespace SeatingAssignments.Services
       var currentSortedStudentPos = 0;
 
       Func<int, bool> outOfStudentsFunc = (currentPosition) => currentPosition >= sortedStudents.Count;
-      Func<int, bool> outOfStudentsNoSpaceFunc = (currentStudentsNoSpaceCount) =>  currentStudentsNoSpaceCount < totalStudents && currentStudentsNoSpaceCount > 0;
+      Func<int, bool> haveStudentsWithNoSpace = (currentStudentsNoSpaceCount) =>  currentStudentsNoSpaceCount < totalStudents && currentStudentsNoSpaceCount > 0;
 
       for (var row = 1; row <= rows; row++)
       {
@@ -74,7 +74,7 @@ namespace SeatingAssignments.Services
 
           var addEvenRowStudent = false;
           var addOddRowStudent = false;
-          if (outOfStudentsNoSpaceFunc(studentsNoSpaceCount))
+          if (haveStudentsWithNoSpace(studentsNoSpaceCount))
           {
             addEvenRowStudent = true;
             addOddRowStudent = true;
@@ -91,7 +91,7 @@ namespace SeatingAssignments.Services
             seatingChartResult.Seats[row - 1, col - 1].LastName = sortedStudents[currentSortedStudentPos].LastName;
 
             currentSortedStudentPos++;
-            if (outOfStudentsNoSpaceFunc(studentsNoSpaceCount)) studentsNoSpaceCount--;
+            if (haveStudentsWithNoSpace(studentsNoSpaceCount)) studentsNoSpaceCount--;
           }
           else
           {
